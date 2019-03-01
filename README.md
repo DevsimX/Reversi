@@ -1,0 +1,2 @@
+# Reversi
+OOP lab1

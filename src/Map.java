@@ -13,6 +13,7 @@ class Map {
     private String humanSignal;
     private String computerSignal;
     private ArrayList<String> colorChangeList = new ArrayList<>();
+    private Victory victory = new Victory();
     Map(int dimension){
         this.dimension = dimension;
         map = new Chessman[this.dimension][this.dimension];
@@ -41,11 +42,17 @@ class Map {
                 humanGo();
                 goJudge = true;
             }
-            colorChangeList = new ArrayList<>();
+            reloadColorChangeList();
         }
     }
 
     private boolean check(){
+        checkPlace();
+        checkChessman();
+        return true;
+    }
+
+    private void checkPlace(){
         boolean manGo = false;
         boolean computerGo = false;
         boolean havePlace = false;
@@ -60,26 +67,28 @@ class Map {
                 }
             }
         }
-        colorChangeList = new ArrayList<>();
-        if(blackChessmanNumber == 0){
-            victory(3,"O");
-            return false;
-        }else if(whiteChessmanNumber == 0){
-            victory(3,"X");
-            return false;
-        }
+        reloadColorChangeList();
         if(!havePlace){
-            victory(1,checkNumber());
-            return false;
+            victory.printVictoryInfo(blackChessmanNumber,whiteChessmanNumber,1,countNumber());
         }else if(!manGo && !computerGo){
-            victory(2,checkNumber());
-            return false;
+            victory.printVictoryInfo(blackChessmanNumber,whiteChessmanNumber,2,countNumber());
         }
-        return true;
     }
 
-    private String checkNumber(){
+    private void checkChessman(){
+        if(blackChessmanNumber == 0){
+            victory.printVictoryInfo(blackChessmanNumber,whiteChessmanNumber,3,"O");
+        }else if(whiteChessmanNumber == 0){
+            victory.printVictoryInfo(blackChessmanNumber,whiteChessmanNumber,3,"X");
+        }
+    }
+
+    private String countNumber(){
         return blackChessmanNumber >= whiteChessmanNumber?"X":"O";
+    }
+
+    private void reloadColorChangeList(){
+        colorChangeList = new ArrayList<>();
     }
 
     //need to simplify
@@ -110,7 +119,7 @@ class Map {
                             }
                         }
                     }
-                    colorChangeList = new ArrayList<>();
+                    reloadColorChangeList();
                 }
             }
         }
@@ -269,7 +278,7 @@ class Map {
             input = new Scanner(System.in).next();
         }
         if(judgeFitPlace(input.charAt(0) - 97 , input.charAt(1) - 97 , humanColor) == 0){
-            victory(4,computerSignal);
+            victory.printVictoryInfo(blackChessmanNumber,whiteChessmanNumber,4,computerSignal);
         }
         map[input.charAt(0) - 97][input.charAt(1) - 97] = computerFirst?new WhiteChessman():new BlackChessman();
         if(!computerFirst)
@@ -326,15 +335,6 @@ class Map {
                     System.out.print(map[i][j].signal + space);
             }
             System.out.println();
-        }
-    }
-
-    private void victory(int i , String signal){
-        switch (i){
-            case 1:System.out.println("No place here!\nGame over.\nX : O = " + blackChessmanNumber + " : " + whiteChessmanNumber + "\n" + signal + " player wins.");break;
-            case 2:System.out.println("Both players have no valid move.\nGame over.\nX : O = " + blackChessmanNumber + " : " + whiteChessmanNumber + "\n" + signal + " player wins.");break;
-            case 3:System.out.println("Game over.\nX : O = " +  + blackChessmanNumber + " : " + whiteChessmanNumber + "\n" + signal + " player wins.");break;
-            case 4:System.out.println("Invalid move.\nGame over.\n" + signal + " player wins.");break;
         }
     }
 }
